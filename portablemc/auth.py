@@ -113,6 +113,7 @@ class YggdrasilAuthSession(AuthSession):
 
     db_type = "yggdrasil"
     user_type = "mojang"
+    sv_url = ""
 
     @classmethod
     def fix_data(cls, data: dict):
@@ -123,13 +124,13 @@ class YggdrasilAuthSession(AuthSession):
         return self.request("validate", {
             "accessToken": self.access_token,
             "clientToken": self.client_id
-        }, False)[0] == 204
-
+        }, False, server_url=self.sv_url)[0] == 204
+        
     def refresh(self):
         _, res = self.request("refresh", {
             "accessToken": self.access_token,
             "clientToken": self.client_id
-        })
+        }, server_url=self.sv_url)
         self.access_token = res["accessToken"]
         self.username = res["selectedProfile"]["name"]  # Refresh username if renamed (does it works? to check.).
 
@@ -137,10 +138,10 @@ class YggdrasilAuthSession(AuthSession):
         self.request("invalidate", {
             "accessToken": self.access_token,
             "clientToken": self.client_id
-        }, False)
+        }, False, server_url=self.sv_url)
 
     @classmethod
-    def authenticate(cls, client_id: str, email: str, password: str) -> 'YggdrasilAuthSession':
+    def authenticate(cls, client_id: str, email: str, password: str, server_url: str) -> 'YggdrasilAuthSession':
         _, res = cls.request("authenticate", {
             "agent": {
                 "name": "Minecraft",
@@ -149,8 +150,9 @@ class YggdrasilAuthSession(AuthSession):
             "username": email,
             "password": password,
             "clientToken": client_id
-        })
+        }, server_url)
         sess = cls()
+        sess.sv_url = server_url
         sess.access_token = res["accessToken"]
         sess.username = res["selectedProfile"]["name"]
         sess.uuid = res["selectedProfile"]["id"]
@@ -158,12 +160,14 @@ class YggdrasilAuthSession(AuthSession):
         return sess
 
     @classmethod
-    def request(cls, req: str, payload: dict, raise_error: bool = True) -> Tuple[int, dict]:
+    def request(cls, req: str, payload: dict, server_url: str, raise_error: bool = True) -> Tuple[int, dict]:
         try:
-            res = http_request("POST", f"https://authserver.mojang.com/{req}", 
+            res = http_request("POST", f"{server_url}/{req}", 
                 data=json.dumps(payload).encode("ascii"),
                 accept="application/json",
                 content_type="application/json")
+            if res.status == 204:
+                return res.status, {}
             return res.status, res.json()
         except HttpError as error:
             try:

@@ -672,7 +672,7 @@ def prompt_yggdrasil_authenticate(ns: RootNs, email_or_username: str) -> Optiona
         ns.out.finish()
         return None
     else:
-        return YggdrasilAuthSession.authenticate(ns.auth_database.get_client_id(), email_or_username, password)
+        return YggdrasilAuthSession.authenticate(ns.auth_database.get_client_id(), email_or_username, password, ns.auth_server)
 
 
 def prompt_microsoft_authenticate(ns: AuthBaseNs, email: str) -> Optional[MicrosoftAuthSession]:

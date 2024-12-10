@@ -28,6 +28,7 @@ class RootNs:
     context: Context
     version_manifest: VersionManifest
     auth_database: AuthDatabase
+    auth_server: str
     socket_error_tips: List[str]
 
 class SearchNs(RootNs):
@@ -156,6 +157,7 @@ def register_start_arguments(parser: ArgumentParser) -> None:
     parser.add_argument("--include-bin", help=_("args.start.include_bin"), action="append", metavar="PATH", type=type_path)
     parser.add_argument("--auth-anonymize", help=_("args.start.auth_anonymize"), action="store_true")
     register_common_auth_service(parser)
+    parser.add_argument("--auth-server", help=_("args.start.auth_server"), default="https://authserver.mojang.com", type=type_url)
     parser.add_argument("-t", "--temp-login", help=_("args.start.temp_login"), action="store_true")
     parser.add_argument("-l", "--login", help=_("args.start.login"), type=type_email_or_username)
     parser.add_argument("-u", "--username", help=_("args.start.username"), metavar="NAME")
@@ -244,6 +246,9 @@ def type_email_or_username(s: str) -> str:
     return s
 
 def type_host(s: str) -> str:
+    return s
+
+def type_url(s: str) -> str:
     return s
 
 

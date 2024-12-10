@@ -125,6 +125,7 @@ lang = {
         "On linux, version numbers are discarded (e.g. /usr/lib/foo.so.1.22.2 -> foo.so). "
         "Read the --exclude-lib help for use cases.",
     "args.start.auth_anonymize": "Anonymize your email or username for authentication messages.",
+    "args.start.auth_server": "Uses specified URL as the Yggdrasil authentication server.",
     "args.start.temp_login": "Flag used with -l (--login) to tell launcher not to cache your session if "
         "not already cached, disabled by default.",
     "args.start.login": "Use a email (or deprecated username) to authenticate using selected "
