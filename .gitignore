@@ -3,6 +3,7 @@
 # Ignore compiled python
 __pycache__
 /dist
+/build
 
 # Do not keep tests and coverage results
 .pytest_cache
