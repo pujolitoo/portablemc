@@ -617,6 +617,7 @@ def prompt_authenticate(ns: AuthBaseNs, email: str, caching: bool, anonymise: bo
     ns.out.task("..", task_text, email=email_text)
 
     session = ns.auth_database.get(email, session_class)
+    session.auth_server = ns.auth_server
     if session is not None:
         try:
             

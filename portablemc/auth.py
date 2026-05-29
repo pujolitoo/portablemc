@@ -13,6 +13,7 @@ from .http import HttpError, http_request
 from typing import Optional, Dict, Type, Tuple
 
 
+
 class AuthSession:
     """An abstract class for defining authentication sessions. These sessions are then
     provided as an argument for starting the game. They provide all information such as
@@ -30,7 +31,7 @@ class AuthSession:
     db_type: str
     user_type: str
     fields = "access_token", "username", "uuid", "client_id"
-
+    
     @classmethod
     def fix_data(cls, data: dict) -> None:
         """This optional function may be used by subclass to provide data migration from
@@ -45,6 +46,7 @@ class AuthSession:
         self.username = ""
         self.uuid = ""
         self.client_id = ""
+        self.auth_server = ""
 
     def format_token_argument(self, legacy: bool) -> str:
         """Format the token for the game's command line. Modern versions uses the format
@@ -121,10 +123,11 @@ class YggdrasilAuthSession(AuthSession):
             data["client_id"] = data.pop("client_token")
 
     def validate(self) -> bool:
+        print(self.sv_url)
         return self.request("validate", {
             "accessToken": self.access_token,
             "clientToken": self.client_id
-        }, False, server_url=self.sv_url)[0] == 204
+        }, server_url=self.auth_server, raise_error=False)[0] == 204
         
     def refresh(self):
         _, res = self.request("refresh", {
@@ -138,7 +141,7 @@ class YggdrasilAuthSession(AuthSession):
         self.request("invalidate", {
             "accessToken": self.access_token,
             "clientToken": self.client_id
-        }, False, server_url=self.sv_url)
+        }, server_url=self.auth_server, raise_error=False)
 
     @classmethod
     def authenticate(cls, client_id: str, email: str, password: str, server_url: str) -> 'YggdrasilAuthSession':
